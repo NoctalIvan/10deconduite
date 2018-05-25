@@ -3,7 +3,7 @@ document.body.appendChild(app.view);
 
 // load sprites
 const getPath = (a) => 'images/' + a + ".png"
-let images = ["car", "carBlinkLeft", "carBlinkRight","car2", "car3", "circle", "road", "up", "down", "left", "right", "blinkLeft", "blinkRight", "blinkLeftOn", "blinkRightOn", "kmBackground", "speedLimit"]
+let images = ["car", "carBlinkLeft", "carBlinkRight","car2", "car3", "road", "up", "down", "left", "right", "blinkLeft", "blinkRight", "blinkLeftOn", "blinkRightOn", "kmBackground", "speedLimit"]
 
 let data = {
   blinkFrame: 0,
@@ -13,7 +13,23 @@ let data = {
   turn: 0,
   car1: {x: 35, y: -125, speed: Math.random()*5 + 18},
   car2: {x: 300, y: 800, speed: 15},
+  score: 100,
+  timer: 60,
+
+  scoreData: {
+    accBande: 0,
+    noBlink: 0,
+    uselessBlink: 0,
+    strongBreak: 0,
+  },
+  warnings: [],
 }
+setInterval(() => {
+  data.timer --
+  if(data.timer == 0) {
+    console.log('END')
+  }
+}, 1000)
 
 let loader = PIXI.loader.add(images.map(getPath)).load(() => {
   let textures = {
@@ -23,7 +39,6 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     carBlinkLeft: PIXI.loader.resources[getPath("carBlinkLeft")].texture,
     carBlinkRight: PIXI.loader.resources[getPath("carBlinkRight")].texture,
     road: PIXI.loader.resources[getPath("road")].texture,
-    circle: PIXI.loader.resources[getPath("circle")].texture,
     kmBackground: PIXI.loader.resources[getPath("kmBackground")].texture,
     speedLimit: PIXI.loader.resources[getPath("speedLimit")].texture,
 
@@ -42,7 +57,6 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     road2: new PIXI.Sprite(textures.road),
 
     playerCar: new PIXI.Sprite(textures.car),
-    circle: new PIXI.Sprite(textures.circle),
 
     car1: new PIXI.Sprite(textures.car2),
     car2: new PIXI.Sprite(textures.car3),
@@ -59,12 +73,13 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
   }
 
   let texts = {
-    kms: new PIXI.Text('50')
+    kms: new PIXI.Text('50'),
+    score: new PIXI.Text('100/100'),
+    timer: new PIXI.Text('45s'),
   }
 
   // init some positions
   sprites.playerCar.y = 400
-  sprites.circle.y = 280
 
   sprites.left.x = 25
   sprites.left.y = 520
@@ -86,6 +101,10 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
 
   texts.kms.x = 311
   texts.kms.y = 79
+  texts.score.x = 0
+  texts.score.y = 0
+  texts.timer.x = 0
+  texts.timer.y = 25
 
   // add sprites
   for(var s in sprites) {
@@ -181,8 +200,101 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
       car2.speed = Math.random()*5 + 18
     }
 
+    /* score */
+    let score = data.score
+    let warnings = []
+
+    // bandes
+    if(data.playerCarX > 55 && data.playerCarX < 135 || data.playerCarX > 165 && data.playerCarX < 245){
+      data.scoreData.accBande ++
+    } else {
+      data.scoreData.accBande = 0
+    }
+    if(data.scoreData.accBande > 60) {
+      warnings.push('accBande')
+      score -= 0.1
+    }
+    
+    // vitesse
+    if(data.speed < 20) {
+      score -= 0.2
+      warnings.push('lowSpeed')
+    }
+    else if(data.speed > 25){
+      score -= 0.05
+      warnings.push('highSpeed')      
+    }
+
+    // blinkers
+    if(actions.left && !actions.blinkLeft || actions.right && !actions.blinkRight) {
+      data.scoreData.noBlink ++
+    } else {
+      data.scoreData.noBlink = 0
+    }
+    if(data.scoreData.noBlink > 20) {
+      warnings.push('noBlink')
+      score -= 0.5
+    }
+
+    if(!actions.left && actions.blinkLeft || !actions.right && actions.blinkRight) {
+      data.scoreData.uselessBlink ++
+    } else {
+      data.scoreData.uselessBlink = 0
+    }
+    if(data.scoreData.uselessBlink > 120) {
+      warnings.push('uselessBlink')
+      score -= 0.1
+    }
+
+    // strong turns
+    if(Math.abs(turn) > 1) {
+      warnings.push('strongTurn')
+      score -= 0.3
+    }
+
+    // strong break
+    if(actions.down) {
+      data.scoreData.strongBreak ++
+    } else {
+      data.scoreData.strongBreak = 0
+    }
+    if(data.scoreData.strongBreak > 20) {
+      warnings.push('strongBreak')
+      score -= 0.1
+    }
+
+    // distance (120 * 420 around) - car = 80 * 150
+    const zone = {
+      minX: data.playerCarX,
+      maxX: data.playerCarX + 80,
+      minY: 400 - 100,
+      maxY: 400 + 150 + 100,
+    }
+    const c1 = {
+      minX: data.car1.x,
+      maxX: data.car1.x + 80,
+      minY: data.car1.y,
+      maxY: data.car1.y + 150,
+    }
+    const c2 = {
+      minX: data.car2.x,
+      maxX: data.car2.x + 80,
+      minY: data.car2.y,
+      maxY: data.car2.y + 150,
+    }
+
+    if(c1.maxX > zone.minX && c1.minX < zone.maxX && c1.maxY > zone.minY && c1.minY < zone.maxY ||
+      c2.maxX > zone.minX && c2.minX < zone.maxX && c2.maxY > zone.minY && c2.minY < zone.maxY){
+      score -= 0.1
+      warnings.push('zone')
+    }
+
+    if(warnings.length > 0) console.log(warnings)
+    
     data = {
       ... data,
+      score,
+      warnings,
       blinkFrame: data.blinkFrame + 1,
       roadPosition: (data.roadPosition + delta * data.speed)%1280,
       playerCarX: data.playerCarX + turn * 5 * delta,
@@ -200,7 +312,6 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
 
     // playerCar
     sprites.playerCar.x = data.playerCarX
-    sprites.circle.x = data.playerCarX - 20
     
     if(actions.blinkLeft && Math.floor(data.blinkFrame/20) % 2 == 0) {
       sprites.playerCar.setTexture(textures.carBlinkLeft)
@@ -224,6 +335,8 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
 
     // text
     texts.kms.setText(Math.round(speed*3))
+    texts.score.setText(Math.floor(data.score) + "/100")
+    texts.timer.setText(data.timer + "s")
 
   });
 })
