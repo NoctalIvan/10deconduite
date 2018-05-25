@@ -1,0 +1,11 @@
+ - 10 de conduite =
+
+ -> 1 serveur crud node
+ 
+ -> 1 client B2C
+   - get name
+   - load & play car game
+   - send score & display dashboard
+
+ -> 1 serveur B2B
+   - display names & general score analytics
