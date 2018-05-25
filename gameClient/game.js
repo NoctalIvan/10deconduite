@@ -3,10 +3,10 @@ document.body.appendChild(app.view);
 
 // load sprites
 const getPath = (a) => 'images/' + a + ".png"
-let images = ["car", "car2", "circle", "road", "up", "down", "left", "right", "blinkLeft", "blinkRight"]
+let images = ["car", "carBlinkLeft", "carBlinkRight","car2", "circle", "road", "up", "down", "left", "right", "blinkLeft", "blinkRight", "blinkLeftOn", "blinkRightOn"]
 
 let data = {
-  frame: 0,
+  blinkFrame: 0,
   roadPosition: 0,
   speed: 5,
   playerCarX: 360/2 -60/2,
@@ -14,22 +14,40 @@ let data = {
 }
 
 let loader = PIXI.loader.add(images.map(getPath)).load(() => {
+  let textures = {
+    car: PIXI.loader.resources[getPath("car")].texture,
+    car2: PIXI.loader.resources[getPath("car2")].texture,
+    carBlinkLeft: PIXI.loader.resources[getPath("carBlinkLeft")].texture,
+    carBlinkRight: PIXI.loader.resources[getPath("carBlinkRight")].texture,
+    road: PIXI.loader.resources[getPath("road")].texture,
+    circle: PIXI.loader.resources[getPath("circle")].texture,
+
+    up: PIXI.loader.resources[getPath("up")].texture,
+    down: PIXI.loader.resources[getPath("down")].texture,
+    left: PIXI.loader.resources[getPath("left")].texture,
+    right: PIXI.loader.resources[getPath("right")].texture,
+    blinkLeft: PIXI.loader.resources[getPath("blinkLeft")].texture,
+    blinkLeftOn: PIXI.loader.resources[getPath("blinkLeftOn")].texture,
+    blinkRight: PIXI.loader.resources[getPath("blinkRight")].texture,
+    blinkRightOn: PIXI.loader.resources[getPath("blinkRightOn")].texture,
+  }
+
   let sprites = {
-    road1: new PIXI.Sprite(PIXI.loader.resources[getPath("road")].texture),
-    road2: new PIXI.Sprite(PIXI.loader.resources[getPath("road")].texture),
+    road1: new PIXI.Sprite(textures.road),
+    road2: new PIXI.Sprite(textures.road),
 
-    playerCar: new PIXI.Sprite(PIXI.loader.resources[getPath("car")].texture),
-    circle: new PIXI.Sprite(PIXI.loader.resources[getPath("circle")].texture),
+    playerCar: new PIXI.Sprite(textures.car),
+    circle: new PIXI.Sprite(textures.circle),
 
-    ennemyCars1: new PIXI.Sprite(PIXI.loader.resources[getPath("car2")].texture),
-    ennemyCars2: new PIXI.Sprite(PIXI.loader.resources[getPath("car2")].texture),
+    ennemyCars1: new PIXI.Sprite(textures.car2),
+    ennemyCars2: new PIXI.Sprite(textures.car2),
 
-    up: new PIXI.Sprite(PIXI.loader.resources[getPath("up")].texture),
-    down: new PIXI.Sprite(PIXI.loader.resources[getPath("down")].texture),
-    left: new PIXI.Sprite(PIXI.loader.resources[getPath("left")].texture),
-    right: new PIXI.Sprite(PIXI.loader.resources[getPath("right")].texture),
-    blinkLeft: new PIXI.Sprite(PIXI.loader.resources[getPath("blinkLeft")].texture),
-    blinkRight: new PIXI.Sprite(PIXI.loader.resources[getPath("blinkRight")].texture),
+    up: new PIXI.Sprite(textures.up),
+    down: new PIXI.Sprite(textures.down),
+    left: new PIXI.Sprite(textures.left),
+    right: new PIXI.Sprite(textures.right),
+    blinkLeft: new PIXI.Sprite(textures.blinkLeft),
+    blinkRight: new PIXI.Sprite(textures.blinkRight),
   }
 
   // init some positions
@@ -84,15 +102,20 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
   sprites.right.on('pointerup', () => {actions.right = false})
     sprites.right.on('pointerupoutside', () => {actions.right = false})
 
-  sprites.blinkLeft.on('pointerdown', () => {actions.blinkLeft = !actions.blinkLeft})
-  sprites.blinkRight.on('pointerdown', () => {actions.blinkRight = !actions.blinkLeft})
+  sprites.blinkLeft.on('pointerdown', () => {
+    actions.blinkLeft = !actions.blinkLeft;
+    actions.blinkRight = false
+    data.blinkFrame = 0
+  })
+  sprites.blinkRight.on('pointerdown', () => {
+    actions.blinkRight = !actions.blinkRight; 
+    actions.blinkLeft = false
+    data.blinkFrame = 0
+  })
 
   // starts game loop
   app.ticker.add(delta => {
-
-    // GAME LOOP
-
-    // UPDATE DATA
+    /* UPDATE DATA */
     let turn = data.turn
     let base = 0.02 * delta
     if(actions.left && !actions.right) turn -= base
@@ -110,14 +133,14 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
 
     data = {
       ... data,
-      frame: (data.frame + 1),
+      blinkFrame: data.blinkFrame + 1,
       roadPosition: (data.roadPosition + delta * data.speed)%1280,
       playerCarX: data.playerCarX + turn * 5 * delta,
       turn,
       speed,
     }
 
-    // RENDER
+    /* RENDER */
     
     // lines
     sprites.road1.y = data.roadPosition
@@ -126,6 +149,20 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     // playerCar
     sprites.playerCar.x = data.playerCarX
     sprites.circle.x = data.playerCarX - 20
+    
+    if(actions.blinkLeft && Math.floor(data.blinkFrame/20) % 2 == 0) {
+      sprites.playerCar.setTexture(textures.carBlinkLeft)
+      sprites.blinkLeft.setTexture(textures.blinkLeftOn)
+    }
+    else if(actions.blinkRight && Math.floor(data.blinkFrame/20) % 2 == 0) {
+      sprites.playerCar.setTexture(textures.carBlinkRight)
+      sprites.blinkRight.setTexture(textures.blinkRightOn)
+    }
+    else {
+      sprites.playerCar.setTexture(textures.car)
+      sprites.blinkLeft.setTexture(textures.blinkLeft)
+      sprites.blinkRight.setTexture(textures.blinkRight)
+    }
 
   });
 })
