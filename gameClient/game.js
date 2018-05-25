@@ -3,12 +3,12 @@ document.body.appendChild(app.view);
 
 // load sprites
 const getPath = (a) => 'images/' + a + ".png"
-let images = ["car", "carBlinkLeft", "carBlinkRight","car2", "circle", "road", "up", "down", "left", "right", "blinkLeft", "blinkRight", "blinkLeftOn", "blinkRightOn"]
+let images = ["car", "carBlinkLeft", "carBlinkRight","car2", "circle", "road", "up", "down", "left", "right", "blinkLeft", "blinkRight", "blinkLeftOn", "blinkRightOn", "kmBackground", "speedLimit"]
 
 let data = {
   blinkFrame: 0,
   roadPosition: 0,
-  speed: 5,
+  speed: 20,
   playerCarX: 360/2 -60/2,
   turn: 0,
 }
@@ -21,6 +21,8 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     carBlinkRight: PIXI.loader.resources[getPath("carBlinkRight")].texture,
     road: PIXI.loader.resources[getPath("road")].texture,
     circle: PIXI.loader.resources[getPath("circle")].texture,
+    kmBackground: PIXI.loader.resources[getPath("kmBackground")].texture,
+    speedLimit: PIXI.loader.resources[getPath("speedLimit")].texture,
 
     up: PIXI.loader.resources[getPath("up")].texture,
     down: PIXI.loader.resources[getPath("down")].texture,
@@ -48,6 +50,13 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     right: new PIXI.Sprite(textures.right),
     blinkLeft: new PIXI.Sprite(textures.blinkLeft),
     blinkRight: new PIXI.Sprite(textures.blinkRight),
+
+    kmBackground: new PIXI.Sprite(textures.kmBackground),
+    speedLimit: new PIXI.Sprite(textures.speedLimit),
+  }
+
+  let texts = {
+    kms: new PIXI.Text('50')
   }
 
   // init some positions
@@ -67,9 +76,20 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
   sprites.down.x = 140
   sprites.down.y = 470
 
+  sprites.speedLimit.x = 300
+  sprites.speedLimit.y = 10
+  sprites.kmBackground.x = 300
+  sprites.kmBackground.y = 70
+
+  texts.kms.x = 311
+  texts.kms.y = 79
+
   // add sprites
   for(var s in sprites) {
     app.stage.addChild(sprites[s])
+  }
+  for(var s in texts) {
+    app.stage.addChild(texts[s])
   }
 
   // interractions
@@ -163,6 +183,9 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
       sprites.blinkLeft.setTexture(textures.blinkLeft)
       sprites.blinkRight.setTexture(textures.blinkRight)
     }
+
+    // text
+    texts.kms.setText(Math.round(speed*3))
 
   });
 })
