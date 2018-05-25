@@ -3,7 +3,7 @@ document.body.appendChild(app.view);
 
 // load sprites
 const getPath = (a) => 'images/' + a + ".png"
-let images = ["car", "carBlinkLeft", "carBlinkRight","car2", "circle", "road", "up", "down", "left", "right", "blinkLeft", "blinkRight", "blinkLeftOn", "blinkRightOn", "kmBackground", "speedLimit"]
+let images = ["car", "carBlinkLeft", "carBlinkRight","car2", "car3", "circle", "road", "up", "down", "left", "right", "blinkLeft", "blinkRight", "blinkLeftOn", "blinkRightOn", "kmBackground", "speedLimit"]
 
 let data = {
   blinkFrame: 0,
@@ -11,12 +11,15 @@ let data = {
   speed: 20,
   playerCarX: 360/2 -60/2,
   turn: 0,
+  car1: {x: 35, y: -125, speed: Math.random()*5 + 18},
+  car2: {x: 300, y: 800, speed: 15},
 }
 
 let loader = PIXI.loader.add(images.map(getPath)).load(() => {
   let textures = {
     car: PIXI.loader.resources[getPath("car")].texture,
     car2: PIXI.loader.resources[getPath("car2")].texture,
+    car3: PIXI.loader.resources[getPath("car3")].texture,
     carBlinkLeft: PIXI.loader.resources[getPath("carBlinkLeft")].texture,
     carBlinkRight: PIXI.loader.resources[getPath("carBlinkRight")].texture,
     road: PIXI.loader.resources[getPath("road")].texture,
@@ -41,8 +44,8 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     playerCar: new PIXI.Sprite(textures.car),
     circle: new PIXI.Sprite(textures.circle),
 
-    ennemyCars1: new PIXI.Sprite(textures.car2),
-    ennemyCars2: new PIXI.Sprite(textures.car2),
+    car1: new PIXI.Sprite(textures.car2),
+    car2: new PIXI.Sprite(textures.car3),
 
     up: new PIXI.Sprite(textures.up),
     down: new PIXI.Sprite(textures.down),
@@ -136,6 +139,8 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
   // starts game loop
   app.ticker.add(delta => {
     /* UPDATE DATA */
+
+    // turn & speed
     let turn = data.turn
     let base = 0.02 * delta
     if(actions.left && !actions.right) turn -= base
@@ -148,14 +153,41 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     base = 0.3 * delta
     if(actions.down && !actions.up) speed -= base
     else if(!actions.down && actions.up) speed += base
-    if(speed < 0) speed = 0
-    if(speed > 30) speed = 30
+    if(speed < 4) speed = 4
+    if(speed > 33) speed = 33
+
+    // cars
+    const car1 = {
+      ... data.car1,
+      y: data.car1.y - data.car1.speed + speed
+    }
+    const car2 = {
+      ... data.car2,
+      y: data.car2.y - data.car2.speed + speed
+    }
+    
+    if(car1.y > 1000 || car1.y < -125) {
+      car1.y = -125
+      do{
+        car1.x = Math.floor(Math.random()*3) * 115 + 35
+      } while(car1.x == car2.x)
+      car1.speed = Math.random()*5 + 18
+    } 
+    if(car2.y > 1000 || car2.y < -125) {
+      car2.y = -125
+      do{
+        car2.x = Math.floor(Math.random()*3) * 115 + 35
+      } while(car1.x == car2.x)
+      car2.speed = Math.random()*5 + 18
+    }
 
     data = {
       ... data,
       blinkFrame: data.blinkFrame + 1,
       roadPosition: (data.roadPosition + delta * data.speed)%1280,
       playerCarX: data.playerCarX + turn * 5 * delta,
+      car1,
+      car2,
       turn,
       speed,
     }
@@ -183,6 +215,12 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
       sprites.blinkLeft.setTexture(textures.blinkLeft)
       sprites.blinkRight.setTexture(textures.blinkRight)
     }
+
+    // cars
+    sprites.car1.x = data.car1.x
+    sprites.car1.y = data.car1.y
+    sprites.car2.x = data.car2.x
+    sprites.car2.y = data.car2.y
 
     // text
     texts.kms.setText(Math.round(speed*3))
