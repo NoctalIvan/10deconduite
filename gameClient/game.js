@@ -31,6 +31,17 @@ setInterval(() => {
   }
 }, 1000)
 
+const niceWarning = {
+  accBande: "bande blanche",
+  lowSpeed: "vitesse insuffisante",
+  highSpeed: "vitesse trop élevée",
+  noBlink: "clignottants manquants",
+  uselessBlink: "clignottants obsolètes",
+  strongTurn: "virage trop serré",
+  strongBreak: "freinage trop fort",
+  zone: "distances de sécurité",
+}
+
 let loader = PIXI.loader.add(images.map(getPath)).load(() => {
   let textures = {
     car: PIXI.loader.resources[getPath("car")].texture,
@@ -76,6 +87,10 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     kms: new PIXI.Text('50'),
     score: new PIXI.Text('100/100'),
     timer: new PIXI.Text('45s'),
+
+    warning1: new PIXI.Text(''),
+    warning2: new PIXI.Text(''),
+    warning3: new PIXI.Text(''),
   }
 
   // init some positions
@@ -105,6 +120,10 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
   texts.score.y = 0
   texts.timer.x = 0
   texts.timer.y = 25
+
+  texts.warning1.y = 60
+  texts.warning2.y = 85
+  texts.warning3.y = 110
 
   // add sprites
   for(var s in sprites) {
@@ -217,11 +236,11 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     
     // vitesse
     if(data.speed < 20) {
-      score -= 0.2
+      score -= 0.05
       warnings.push('lowSpeed')
     }
     else if(data.speed > 25){
-      score -= 0.05
+      score -= 0.1
       warnings.push('highSpeed')      
     }
 
@@ -268,7 +287,7 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
       minX: data.playerCarX,
       maxX: data.playerCarX + 80,
       minY: 400 - 100,
-      maxY: 400 + 150 + 100,
+      maxY: 400 + 150 + 50,
     }
     const c1 = {
       minX: data.car1.x,
@@ -337,6 +356,10 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     texts.kms.setText(Math.round(speed*3))
     texts.score.setText(Math.floor(data.score) + "/100")
     texts.timer.setText(data.timer + "s")
+
+    texts.warning1.setText(warnings[0] ? niceWarning[warnings[0]] : '')
+    texts.warning2.setText(warnings[1] ? niceWarning[warnings[1]] : '')
+    texts.warning3.setText(warnings[2] ? niceWarning[warnings[2]] : '')
 
   });
 })
