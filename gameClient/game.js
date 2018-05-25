@@ -27,7 +27,7 @@ let data = {
 setInterval(() => {
   data.timer --
   if(data.timer == 0) {
-    console.log('END')
+    end()
   }
 }, 1000)
 
@@ -40,6 +40,14 @@ const niceWarning = {
   strongTurn: "virage trop serré",
   strongBreak: "freinage trop fort",
   zone: "distances de sécurité",
+  route: "hors route",
+}
+
+let ended = false
+const end = () => {
+  console.log("end")
+  localStorage.setItem('score', JSON.stringify(data))
+  // location.href = '/result'
 }
 
 let loader = PIXI.loader.add(images.map(getPath)).load(() => {
@@ -176,6 +184,7 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
 
   // starts game loop
   app.ticker.add(delta => {
+    if(ended) return
     /* UPDATE DATA */
 
     // turn & speed
@@ -232,6 +241,12 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     if(data.scoreData.accBande > 60) {
       warnings.push('accBande')
       score -= 0.1
+    }
+
+    // route
+    if(data.playerCarX < 15 || data.playerCarX > 285){
+      warnings.push('route')
+      score -= 0.3
     }
     
     // vitesse
@@ -308,8 +323,6 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
       warnings.push('zone')
     }
 
-    if(warnings.length > 0) console.log(warnings)
-    
     data = {
       ... data,
       score,
@@ -322,7 +335,15 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
       turn,
       speed,
     }
-
+    if(data.playerCarX < 0) {
+      data.playerCarX = 0
+      turn = 0
+    }
+    if(data.playerCarX > 360 - 60) {
+      data.playerCarX = 360-60
+      turn = 0
+    }
+    
     /* RENDER */
     
     // lines
@@ -354,12 +375,13 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
 
     // text
     texts.kms.setText(Math.round(speed*3))
-    texts.score.setText(Math.floor(data.score) + "/100")
+    texts.score.setText(Math.floor(data.score)/10 + "/10")
     texts.timer.setText(data.timer + "s")
 
     texts.warning1.setText(warnings[0] ? niceWarning[warnings[0]] : '')
     texts.warning2.setText(warnings[1] ? niceWarning[warnings[1]] : '')
     texts.warning3.setText(warnings[2] ? niceWarning[warnings[2]] : '')
 
+    if(score < 0) end()
   });
 })
