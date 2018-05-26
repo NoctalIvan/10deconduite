@@ -1,5 +1,9 @@
 let app = new PIXI.Application({width: 360, height: 640, antialias: true});
+app.renderer.autoResize = true;
+app.renderer.resize(window.innerWidth, window.innerHeight);
+
 document.body.appendChild(app.view);
+
 
 // load sprites
 const getPath = (a) => 'images/' + a + ".png"
