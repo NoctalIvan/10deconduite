@@ -55,7 +55,7 @@
     <br/>
     <div class="container" style="position: relative; min-height: 324px">
       <canvas id="grosRond" class="grosRond valign-wrapper center-align"></canvas>
-      <div>8,4</div>
+      <div id="score">8,4</div>
     </div>
     <br/>
     <br/>
@@ -74,9 +74,12 @@
     <script src="3rd/Chart.min.js"></script>
 
     <script>
+      let data = JSON.parse(localStorage.getItem('score')) // demoErrors
+      let errors = data.errors
+      const score = data.collision ? 0 : data.score/10
+
       // Donut
       var ctx = document.getElementById('grosRond').getContext('2d');
-      var score = 8.4
       var myDoughnutChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -142,23 +145,23 @@
         collision: "Collision",
       }
 
-      let errors = demoErrors
-      errors.collision = {
-        lost: 10
-      }
-
       let str = ''
-      errors = Object.keys(errors).map(e => ({... errors[e], key: e})).sort(function(a,b){return b.lost - a.lost})
+      errors = (data.collision ? [{
+        key: "collision",
+        lost: 100,
+      }] : []).concat(Object.keys(errors).map(e => ({... errors[e], key: e})).sort(function(a,b){return b.lost - a.lost}))
+
       for(var error of errors){
         str += template({
           icon: '/icons/' + error.key + '.svg',
-          background:  error.lost == 10 ? 'rgba(255,0,0,0.2)' : '',
-          color: error.lost == 0 ? '#9CC03B' : (error.lost < 2 ? '#fe7310' : 'red'),
+          background:  error.lost == 100 ? 'rgba(255,0,0,0.2)' : '',
+          color: error.lost == 0 ? '#9CC03B' : (error.lost < 20 ? '#fe7310' : 'red'),
           name: niceWarning[error.key],
-          points: error.lost.toFixed(1),
+          points: (error.lost/10).toFixed(1),
         })
       }
       document.getElementById('cepabien').innerHTML = str
+      document.getElementById('score').innerHTML = score.toFixed(1).replace('.', ',')
     </script>
 
   </body>
