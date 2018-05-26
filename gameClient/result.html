@@ -18,10 +18,10 @@
 
       .grosRond + div {
         position: absolute;
-        top: 70px;
+        top: 25vw;
         left: 0;
         width: 100%;
-        font-size: 110px;
+        font-size: 90px;
         text-align: center;
         color: #5a5a5a;
       }
@@ -32,29 +32,39 @@
         right: 8px;
         top: 8px;
       }
+
+      .ptitLogo {
+        height: 37px; 
+        position: absolute;
+        left:14px;
+        top: 10px;
+      }
     </style>
   </head>
 
   <body>
-    <nav>
+    <nav style="background: #FFCC33">
       <div class="nav-wrapper">
-        <a href="#" class="brand-logo">Dashboard</a>
-        <img src="https://i1.wp.com/www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png?fit=256%2C256&quality=100" class="ptitIcon" />
+        <a href="#" class="brand-logo">Votre Score</a>
+        <img src="/images/sylvie.png" class="ptitIcon" />
+        <img src="/images/logo.svg" class="ptitLogo" />
       </div>
     </nav>
-    
+
+    <br/>
     <br/>
     <div class="container" style="position: relative; min-height: 324px">
       <canvas id="grosRond" class="grosRond valign-wrapper center-align"></canvas>
-      <div>8.4/10</div>
+      <div>8,4</div>
     </div>
+    <br/>
     <br/>
 
     <div id="cepabien" class="row container">
 
     </div>
 
-    <a class="btn" style="text-align: center; display: block; margin: 0 20%" href="/">Rejouer</a>
+    <a class="btn" style="text-align: center; display: block; margin: 0 20%; background: #FFCC33; color: black; font-weight: bold " href="/">Rejouer</a>
 
     <br/>
             
@@ -71,13 +81,13 @@
         type: 'doughnut',
         data: {
           labels: [
-            'yellow',
-            'gray'
+            '#FFCC33',
+            '#fe7310'
           ],
           datasets: [{
             backgroundColor: [
-              'yellow',
-              'red'
+              '#FFCC33',
+              'gray'
             ],
             data: [score, 10-score],
           }]
@@ -94,14 +104,14 @@
 
       // tooltips
       const template = (a) => {
-        return `<div class="card horizontal">
+        return `<div class="card horizontal" style="border-left: 15px solid ${a.color}; background: ${a.background};">
             <div class="card-image" style="width: 33%; padding: 1em">
               <img src="${a.icon}">
             </div>
             <div class="card-stacked">
               <div class="card-content">
                 <p><strong>${a.name}</strong></p>
-                <p style="font-size: 25px; text-align: right"> - ${a.points} pts</p>
+                <p style="font-size: 25px; text-align: right; visibility: ${a.points == 0 ? 'hidden' : 'visible'}; color: ${a.color}; font-weight: bold"> - ${a.points} pts</p>
               </div>
             </div>
           </div>`
@@ -112,32 +122,38 @@
         route: {lost: 2.156},
         lowSpeed: {lost: 2.1},
         highSpeed: {lost: 2.1},
-        noBlink: {lost: 2.1},
+        noBlink: {lost: 1.2},
         uselessBlink: {lost: 2.1},
-        strongTurn: {lost: 2.1},
-        strongBreak: {lost: 2.1},
-        zone: {lost: 2.1},
+        strongTurn: {lost: 1.1},
+        strongBreak: {lost: 0},
+        zone: {lost: 0},
       }
 
       const niceWarning = {
-        accBande: "bande blanche",
-        lowSpeed: "vitesse insuffisante",
-        highSpeed: "vitesse trop élevée",
-        noBlink: "clignottants manquants",
-        uselessBlink: "clignottants obsolètes",
-        strongTurn: "virage trop serré",
-        strongBreak: "freinage trop fort",
-        zone: "distances de sécurité",
-        route: "hors route",
+        accBande: "Bande blanche",
+        lowSpeed: "Vitesse insuffisante",
+        highSpeed: "Vitesse trop élevée",
+        noBlink: "Clignottants manquants",
+        uselessBlink: "Clignottants superflus",
+        strongTurn: "Virage trop serré",
+        strongBreak: "Freinage trop fort",
+        zone: "Distances de sécurité",
+        route: "Hors-route",
+        collision: "Collision",
       }
 
       const errors = demoErrors
+      errors.collision = {
+        lost: 10
+      }
 
       let str = ''
       for(var key in errors){
         const error = errors[key]
         str += template({
-          icon: 'http://www.hicom.fr/wp-content/uploads/2017/09/Logo_TV_2015.png',
+          icon: '/icons/' + key + '.svg',
+          background:  error.lost == 10 ? 'rgba(255,0,0,0.2)' : '',
+          color: error.lost == 0 ? '#9CC03B' : (error.lost < 2 ? '#fe7310' : 'red'),
           name: niceWarning[key],
           points: error.lost.toFixed(1),
         })

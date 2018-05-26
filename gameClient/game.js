@@ -25,7 +25,15 @@ let data = {
   warnings: [],
 
   errors: {
-    
+    accBande: {lost: 0},
+    route: {lost: 0},
+    lowSpeed: {lost: 0},
+    highSpeed: {lost: 0},
+    noBlink: {lost: 0},
+    uselessBlink: {lost: 0},
+    strongTurn: {lost: 0},
+    strongBreak: {lost: 0},
+    zone: {lost: 0},
   }
 }
 setInterval(() => {
@@ -36,22 +44,21 @@ setInterval(() => {
 }, 1000)
 
 const niceWarning = {
-  accBande: "bande blanche",
-  lowSpeed: "vitesse insuffisante",
-  highSpeed: "vitesse trop élevée",
-  noBlink: "clignottants manquants",
-  uselessBlink: "clignottants obsolètes",
-  strongTurn: "virage trop serré",
-  strongBreak: "freinage trop fort",
-  zone: "distances de sécurité",
-  route: "hors route",
+  accBande: "Bande blanche",
+  lowSpeed: "Vitesse insuffisante",
+  highSpeed: "Vitesse trop élevée",
+  noBlink: "Clignottants",
+  uselessBlink: "Clignottants superflus",
+  strongTurn: "Virage trop serré",
+  strongBreak: "Freinage trop fort",
+  zone: "Distances de sécurité",
+  route: "Hors-route",
 }
 
 let ended = false
 const end = () => {
-  console.log("end")
   localStorage.setItem('score', JSON.stringify(data))
-  // location.href = '/result'
+  location.href = '/result'
 }
 
 let loader = PIXI.loader.add(images.map(getPath)).load(() => {
@@ -95,14 +102,35 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     speedLimit: new PIXI.Sprite(textures.speedLimit),
   }
 
-  let texts = {
-    kms: new PIXI.Text('50'),
-    score: new PIXI.Text('100/100'),
-    timer: new PIXI.Text('45s'),
+  let drops = {
+    drop1: new PIXI.Graphics(),
+    drop2: new PIXI.Graphics(),
+    drop3: new PIXI.Graphics(),
+  }
 
-    warning1: new PIXI.Text(''),
-    warning2: new PIXI.Text(''),
-    warning3: new PIXI.Text(''),
+  let texts = {
+    kms: new PIXI.Text('50', {
+      fill: 'white',
+    }),
+    score: new PIXI.Text('100/100', {
+      fill: 'white'
+    }),
+    timer: new PIXI.Text('45s', {
+      fill: 'white'
+    }),
+
+    warning1: new PIXI.Text('', {
+      fill: '#ff0000',
+      background: '#ff0000'
+    }),
+    warning2: new PIXI.Text('', {
+      fill: '#ff0000',
+      background: '#ff0000'
+    }),
+    warning3: new PIXI.Text('', {
+      fill: '#ff0000',
+      background: '#ff0000'
+    }),
   }
 
   // init some positions
@@ -135,18 +163,34 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
 
   texts.kms.x = 311
   texts.kms.y = 79
-  texts.score.x = 0
-  texts.score.y = 0
-  texts.timer.x = 0
-  texts.timer.y = 25
+  texts.score.x = 40
+  texts.score.y = 20
+  texts.timer.x = 40
+  texts.timer.y = 50
 
-  texts.warning1.y = 60
-  texts.warning2.y = 85
-  texts.warning3.y = 110
+  texts.warning1.x = 40
+  texts.warning1.y = 100
+  texts.warning2.x = 40
+  texts.warning2.y = 140
+  texts.warning3.x = 40
+  texts.warning3.y = 180
+
+  drops.drop1.beginFill(0x000000, 0.3);
+  drops.drop1.drawRect(35, 100, 260, 32);
+  drops.drop1.endFill();
+  drops.drop2.beginFill(0x000000, 0.3);
+  drops.drop2.drawRect(35, 140, 260, 32);
+  drops.drop2.endFill();
+  drops.drop3.beginFill(0x000000, 0.3);
+  drops.drop3.drawRect(35, 180, 260, 32);
+  drops.drop3.endFill();
 
   // add sprites
   for(var s in sprites) {
     app.stage.addChild(sprites[s])
+  }
+  for(var s in drops) {
+    app.stage.addChild(drops[s])
   }
   for(var s in texts) {
     app.stage.addChild(texts[s])
@@ -244,7 +288,7 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     let warnings = []
 
     // bandes
-    if(data.playerCarX > 55 && data.playerCarX < 135 || data.playerCarX > 165 && data.playerCarX < 245){
+    if(data.playerCarX > 70 && data.playerCarX < 120 || data.playerCarX > 180 && data.playerCarX < 230){
       data.scoreData.accBande ++
     } else {
       data.scoreData.accBande = 0
@@ -388,12 +432,13 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     // collision
     if(c1.maxX > player.minX && c1.minX < player.maxX && c1.maxY > player.minY && c1.minY < player.maxY ||
       c2.maxX > player.minX && c2.minX < player.maxX && c2.maxY > player.minY && c2.minY < player.maxY){
+      data.collision = true
       end()
     }
 
     data = {
       ... data,
-      score,
+      score: score < 0 ? 0 : score,
       warnings,
       blinkFrame: data.blinkFrame + 1,
       roadPosition: (data.roadPosition + delta * data.speed)%1280,
@@ -455,9 +500,10 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     texts.timer.setText(data.timer + "s")
 
     texts.warning1.setText(warnings[0] ? niceWarning[warnings[0]] : '')
+    drops.drop1.alpha = warnings.length > 0 ? 1 : 0
     texts.warning2.setText(warnings[1] ? niceWarning[warnings[1]] : '')
+    drops.drop2.alpha = warnings.length > 1 ? 1 : 0
     texts.warning3.setText(warnings[2] ? niceWarning[warnings[2]] : '')
-
-    if(score < 0) end()
+    drops.drop3.alpha = warnings.length > 2 ? 1 : 0
   });
 })
