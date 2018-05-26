@@ -364,7 +364,7 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     }
 
     /* RENDER */
-    
+
     // lines
     sprites.road1.y = data.roadPosition
     sprites.road2.y = data.roadPosition - 1280
