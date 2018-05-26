@@ -113,9 +113,9 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
   sprites.blinkRight.x = 255
   sprites.blinkRight.y = 420
   sprites.up.x = 140
-  sprites.up.y = 360
+  sprites.up.y = 362
   sprites.down.x = 140
-  sprites.down.y = 470
+  sprites.down.y = 472
 
   sprites.left.alpha = 0.2
   sprites.right.alpha = 0.2
