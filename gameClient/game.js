@@ -297,30 +297,42 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
       score -= 0.1
     }
 
-    // distance (120 * 420 around) - car = 80 * 150
+    // distance (120 * 420 around) - car = 60 * 120
     const zone = {
       minX: data.playerCarX,
-      maxX: data.playerCarX + 80,
+      maxX: data.playerCarX + 60,
       minY: 400 - 100,
-      maxY: 400 + 150 + 50,
+      maxY: 400 + 120 + 50,
+    }
+    const player = {
+      minX: data.playerCarX,
+      maxX: data.playerCarX + 60,
+      minY: 400,
+      maxY: 400 + 120,
     }
     const c1 = {
       minX: data.car1.x,
-      maxX: data.car1.x + 80,
+      maxX: data.car1.x + 60,
       minY: data.car1.y,
-      maxY: data.car1.y + 150,
+      maxY: data.car1.y + 120,
     }
     const c2 = {
       minX: data.car2.x,
-      maxX: data.car2.x + 80,
+      maxX: data.car2.x + 60,
       minY: data.car2.y,
-      maxY: data.car2.y + 150,
+      maxY: data.car2.y + 120,
     }
 
     if(c1.maxX > zone.minX && c1.minX < zone.maxX && c1.maxY > zone.minY && c1.minY < zone.maxY ||
       c2.maxX > zone.minX && c2.minX < zone.maxX && c2.maxY > zone.minY && c2.minY < zone.maxY){
       score -= 0.1
       warnings.push('zone')
+    }
+
+    // collision
+    if(c1.maxX > player.minX && c1.minX < player.maxX && c1.maxY > player.minY && c1.minY < player.maxY ||
+      c2.maxX > player.minX && c2.minX < player.maxX && c2.maxY > player.minY && c2.minY < player.maxY){
+      end()
     }
 
     data = {
@@ -343,7 +355,7 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
       data.playerCarX = 360-60
       turn = 0
     }
-    
+
     /* RENDER */
     
     // lines
