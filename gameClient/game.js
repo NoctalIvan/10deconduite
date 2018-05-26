@@ -397,6 +397,8 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     sprites.down.alpha = actions.down ? 1 : 0.2
     sprites.left.alpha = actions.left ? 1 : 0.2
     sprites.right.alpha = actions.right ? 1 : 0.2
+    sprites.blinkLeft.alpha = actions.blinkLeft ? 0.5 : 0.2
+    sprites.blinkRight.alpha = actions.blinkRight ? 0.5 : 0.2
 
     // text
     texts.kms.setText(Math.round(speed*3))
