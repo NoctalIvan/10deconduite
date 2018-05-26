@@ -117,6 +117,13 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
   sprites.down.x = 140
   sprites.down.y = 470
 
+  sprites.left.alpha = 0.2
+  sprites.right.alpha = 0.2
+  sprites.up.alpha = 0.2
+  sprites.down.alpha = 0.2
+  sprites.blinkLeft.alpha = 0.2
+  sprites.blinkRight.alpha = 0.2
+
   sprites.speedLimit.x = 300
   sprites.speedLimit.y = 10
   sprites.kmBackground.x = 300
@@ -384,6 +391,12 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     sprites.car1.y = data.car1.y
     sprites.car2.x = data.car2.x
     sprites.car2.y = data.car2.y
+
+    // buttons
+    sprites.up.alpha = actions.up ? 1 : 0.2
+    sprites.down.alpha = actions.down ? 1 : 0.2
+    sprites.left.alpha = actions.left ? 1 : 0.2
+    sprites.right.alpha = actions.right ? 1 : 0.2
 
     // text
     texts.kms.setText(Math.round(speed*3))
