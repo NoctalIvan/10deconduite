@@ -26,7 +26,8 @@
         }
       }
       
-      const element = document.getElementsByTagName('canvas')[0].addEventListener("touchstart", function (e) { launchFullScreen() })
+      document.getElementsByTagName('canvas')[0].ontouchstart = launchFullScreen
+      document.getElementsByTagName('canvas')[0].onclick = launchFullScreen
     </script>
   </body>
 </html>
