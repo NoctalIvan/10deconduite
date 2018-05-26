@@ -13,5 +13,19 @@
     <!--JavaScript at end of body for optimized loading-->
     <script type="text/javascript" src="3rd/pixi.min.js"></script>
     <script type="text/javascript" src="game.js"></script>
+    
+    <script>
+      function launchFullScreen(element) {
+        if(element.requestFullScreen) {
+          element.requestFullScreen();
+        } else if(element.mozRequestFullScreen) {
+          element.mozRequestFullScreen();
+        } else if(element.webkitRequestFullScreen) {
+          element.webkitRequestFullScreen();
+        }
+      }
+      
+      launchFullSceen(document.getElementsByTagName('body')[0])
+    </script>
   </body>
 </html>
