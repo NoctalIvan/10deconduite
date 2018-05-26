@@ -23,6 +23,10 @@ let data = {
     strongBreak: 0,
   },
   warnings: [],
+
+  errors: {
+    
+  }
 }
 setInterval(() => {
   data.timer --
@@ -248,22 +252,42 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     if(data.scoreData.accBande > 60) {
       warnings.push('accBande')
       score -= 0.1
+      if(!data.errors.accBande) {
+        data.errors.accBande = {lost: 0.1}
+      } else {
+        data.errors.accBande.lost += 0.1
+      }
     }
 
     // route
     if(data.playerCarX < 15 || data.playerCarX > 285){
       warnings.push('route')
       score -= 0.3
+      if(!data.errors.route) {
+        data.errors.route = {lost: 0.3}
+      } else {
+        data.errors.route.lost += 0.3
+      }
     }
     
     // vitesse
     if(data.speed < 20) {
       score -= 0.05
       warnings.push('lowSpeed')
+      if(!data.errors.lowSpeed) {
+        data.errors.lowSpeed = {lost: 0.05}
+      } else {
+        data.errors.lowSpeed.lost += 0.05
+      }
     }
     else if(data.speed > 25){
       score -= 0.1
-      warnings.push('highSpeed')      
+      warnings.push('highSpeed') 
+      if(!data.errors.highSpeed) {
+        data.errors.highSpeed = {lost: 0.1}
+      } else {
+        data.errors.highSpeed.lost += 0.1
+      }     
     }
 
     // blinkers
@@ -275,6 +299,11 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     if(data.scoreData.noBlink > 20) {
       warnings.push('noBlink')
       score -= 0.5
+      if(!data.errors.noBlink) {
+        data.errors.noBlink = {lost: 0.5}
+      } else {
+        data.errors.noBlink.lost += 0.5
+      }
     }
 
     if(!actions.left && actions.blinkLeft || !actions.right && actions.blinkRight) {
@@ -285,12 +314,22 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     if(data.scoreData.uselessBlink > 120) {
       warnings.push('uselessBlink')
       score -= 0.1
+      if(!data.errors.uselessBlink) {
+        data.errors.uselessBlink = {lost: 0.1}
+      } else {
+        data.errors.uselessBlink.lost += 0.1
+      }
     }
 
     // strong turns
     if(Math.abs(turn) > 1) {
       warnings.push('strongTurn')
       score -= 0.3
+      if(!data.errors.strongTurn) {
+        data.errors.strongTurn = {lost: 0.3}
+      } else {
+        data.errors.strongTurn.lost += 0.3
+      }
     }
 
     // strong break
@@ -302,6 +341,11 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
     if(data.scoreData.strongBreak > 20) {
       warnings.push('strongBreak')
       score -= 0.1
+      if(!data.errors.strongBreak) {
+        data.errors.strongBreak = {lost: 0.1}
+      } else {
+        data.errors.strongBreak.lost += 0.1
+      }
     }
 
     // distance (120 * 420 around) - car = 60 * 120
@@ -332,8 +376,13 @@ let loader = PIXI.loader.add(images.map(getPath)).load(() => {
 
     if(c1.maxX > zone.minX && c1.minX < zone.maxX && c1.maxY > zone.minY && c1.minY < zone.maxY ||
       c2.maxX > zone.minX && c2.minX < zone.maxX && c2.maxY > zone.minY && c2.minY < zone.maxY){
-      score -= 0.1
       warnings.push('zone')
+      score -= 0.1
+      if(!data.errors.zone) {
+        data.errors.zone = {lost: 0.1}
+      } else {
+        data.errors.zone.lost += 0.1
+      }
     }
 
     // collision

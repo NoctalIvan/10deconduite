@@ -50,20 +50,13 @@
     </div>
     <br/>
 
-    <div class="row container">
-      
-      <div class="card horizontal">
-        <div class="card-image" style="width: 33%; padding: 1em">
-          <img src="http://www.hicom.fr/wp-content/uploads/2017/09/Logo_TV_2015.png">
-        </div>
-        <div class="card-stacked">
-          <div class="card-content">
-            <p>I am a very simple card. I am good at containing small bits of information.</p>
-          </div>
-        </div>
-      </div>
+    <div id="cepabien" class="row container">
 
     </div>
+
+    <a class="btn" style="text-align: center; display: block; margin: 0 20%" href="/">Rejouer</a>
+
+    <br/>
             
     
     <!--JavaScript at end of body for optimized loading-->
@@ -71,6 +64,7 @@
     <script src="3rd/Chart.min.js"></script>
 
     <script>
+      // Donut
       var ctx = document.getElementById('grosRond').getContext('2d');
       var score = 8.4
       var myDoughnutChart = new Chart(ctx, {
@@ -97,6 +91,58 @@
           }
         }
       });
+
+      // tooltips
+      const template = (a) => {
+        return `<div class="card horizontal">
+            <div class="card-image" style="width: 33%; padding: 1em">
+              <img src="${a.icon}">
+            </div>
+            <div class="card-stacked">
+              <div class="card-content">
+                <p><strong>${a.name}</strong></p>
+                <p style="font-size: 25px; text-align: right"> - ${a.points} pts</p>
+              </div>
+            </div>
+          </div>`
+      }
+
+      const demoErrors = {
+        accBande: {lost: 2},
+        route: {lost: 2.156},
+        lowSpeed: {lost: 2.1},
+        highSpeed: {lost: 2.1},
+        noBlink: {lost: 2.1},
+        uselessBlink: {lost: 2.1},
+        strongTurn: {lost: 2.1},
+        strongBreak: {lost: 2.1},
+        zone: {lost: 2.1},
+      }
+
+      const niceWarning = {
+        accBande: "bande blanche",
+        lowSpeed: "vitesse insuffisante",
+        highSpeed: "vitesse trop élevée",
+        noBlink: "clignottants manquants",
+        uselessBlink: "clignottants obsolètes",
+        strongTurn: "virage trop serré",
+        strongBreak: "freinage trop fort",
+        zone: "distances de sécurité",
+        route: "hors route",
+      }
+
+      const errors = demoErrors
+
+      let str = ''
+      for(var key in errors){
+        const error = errors[key]
+        str += template({
+          icon: 'http://www.hicom.fr/wp-content/uploads/2017/09/Logo_TV_2015.png',
+          name: niceWarning[key],
+          points: error.lost.toFixed(1),
+        })
+      }
+      document.getElementById('cepabien').innerHTML = str
     </script>
 
   </body>
