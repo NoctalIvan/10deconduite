@@ -12,13 +12,18 @@
 
     <style>
       .grosRond {
-        background: yellow;
-        border-radius: 50%;
-        margin-left: 25vw;
-        margin-top: 3em;
-        margin-bottom: 3em;
         width: 50vw;
         height: 50vw;
+      }
+
+      .grosRond + div {
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        font-size: 110px;
+        text-align: center;
+        color: #5a5a5a;
       }
 
       .ptitIcon {
@@ -38,11 +43,12 @@
       </div>
     </nav>
     
-    <div class="">
-      <div class="grosRond valign-wrapper center-align">
-        9.8 / 10
-      </div>
+    <br/>
+    <div class="container" style="position: relative; min-height: 324px">
+      <canvas id="grosRond" class="grosRond valign-wrapper center-align"></canvas>
+      <div>8.4/10</div>
     </div>
+    <br/>
 
     <div class="row container">
       
@@ -62,5 +68,36 @@
     
     <!--JavaScript at end of body for optimized loading-->
     <script type="text/javascript" src="3rd/materialize.min.js"></script>
+    <script src="3rd/Chart.min.js"></script>
+
+    <script>
+      var ctx = document.getElementById('grosRond').getContext('2d');
+      var score = 8.4
+      var myDoughnutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: [
+            'yellow',
+            'gray'
+          ],
+          datasets: [{
+            backgroundColor: [
+              'yellow',
+              'red'
+            ],
+            data: [score, 10-score],
+          }]
+        },
+        options: {
+          legend: {
+            display: false
+          },
+          tooltips: {
+              enabled: false
+          }
+        }
+      });
+    </script>
+
   </body>
 </html>
