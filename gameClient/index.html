@@ -15,7 +15,8 @@
     <script type="text/javascript" src="game.js"></script>
     
     <script>
-      function launchFullScreen(element) {
+      function launchFullScreen() {
+        const element = document.getElementsByTagName('body')[0]
         if(element.requestFullScreen) {
           element.requestFullScreen();
         } else if(element.mozRequestFullScreen) {
@@ -25,8 +26,7 @@
         }
       }
       
-      launchFullScreen(document.getElementsByTagName('body')[0])
-      document.getElementsByTagName('canvas')[0].onclick = () => {launchFullScreen(document.getElementsByTagName('body')[0])}
+      canvas.addEventListener("touchstart", function (e) { launchFullScreen() })
     </script>
   </body>
 </html>
