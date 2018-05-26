@@ -28,7 +28,7 @@
       .leftPanel {
         width: 15%;
         background: #FFCC33;
-        height: 100vh;
+        height: 300vh;
         z-index: -10;
         position: absolute;
         top: 0;
@@ -43,7 +43,38 @@
         height: 100vh;
         left: 15%;
         top: 0;
-        padding-top: 64px;
+        padding: 2%;
+        padding-top: 70px;
+      }
+
+      #c1Cnt {
+        width: 30%;
+        margin: 1.5% ;
+        padding: 1em ;
+        position: relative;
+      }
+      #c2Cnt {
+        width: 63% !important;
+        margin: 1.5% !important;
+        padding: 1em !important;
+      }
+      #c3Cnt {
+        width: 100% !important;
+        padding: 1em !important;
+      }
+
+      .title {
+        font-size: 30px;
+      }
+
+      #c1 + div {
+        position: absolute;
+        top: 40%;
+        left: 0;
+        width: 100%;
+        font-size: 90px;
+        text-align: center;
+        color: #5a5a5a;
       }
     </style>
   </head>
@@ -51,6 +82,44 @@
   <body>
     
     <div class="rightPanel">
+      <div class="card-panel" style="position: relative">
+        <span style="font-size: 5em">Sylvie Dupont</span>
+        <img src="/images/dacia.jpg" style="height: 100px; position: absolute; top: 10px; right: 10px;"/>
+        <span style="font-size: 30px; position: absolute; top: 110px; right: 10px;">Dacia Sandero</span>
+
+      </div>
+
+      <div class="row">
+
+        <span class="col s4 card-panel" id="c1Cnt">
+          <span class="title">Score Moyen</span>
+          <br/> <br/> 
+            <canvas id="c1"></canvas>
+            <div id="score">8,4</div>
+        </span>
+        <span class="col s4 card-panel" id="c2Cnt">
+            <span class="title">Progression</span> 
+          <br/>   <br/>                  
+            <canvas id="c3"></canvas>
+        </span>
+        <span class="col s4 card-panel" id="c3Cnt">
+            <span class="title">Points perdus en moyenne</span>
+          <br/> <br/>
+
+            <canvas id="c2"></canvas>
+        </span>
+
+        <span class="col s12 card-panel">
+          <span class="title">Mode de Conduite</span>
+          <br/>
+          <br/>
+          <span style="font-size: 2em; padding-left: 1em; display: inline-block; width: 64%; height: 50px; background: #FFCC33"> <strong>64%</strong> Autonome </span>
+          <span style="font-size: 2em; padding-left: 1em; display: inline-block; width: 35%; height: 50px; background: #ccc"> <strong>36%</strong> Manuel </span>
+          <br/>
+
+          <br/> <br/> 
+        </span>
+      </div>
 
     </div>
 
@@ -61,17 +130,128 @@
 
       <div class="nav-wrapper">
         <a href="#" class="brand-logo" style="width: 100%; text-align: center; z-index: 100">Dashboard</a>
-        <img src="/images/sylvie.png" class="ptitIcon" />
-        <img src="/images/logo.svg" class="ptitLogo" />
+        <img src="/images/etienne.png" class="ptitIcon" />
+        <img src="/images/logo-white.svg" class="ptitLogo" />
       </div>
       
-    </nav>  
+    </nav>
 
 
-    
     <!--JavaScript at end of body for optimized loading-->
     <script type="text/javascript" src="3rd/materialize.min.js"></script>
     <script src="3rd/Chart.min.js"></script>
 
+    <script>
+      // Donut
+      var ctx = document.getElementById('c1').getContext('2d');
+      var myDoughnutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: [
+            'Score',
+            '#fe7310'
+          ],
+          datasets: [{
+            backgroundColor: [
+              '#FFCC33',
+              'gray'
+            ],
+            data: [8.4, 1.6],
+          }]
+        },
+        options: {
+          legend: {
+            display: false
+          },
+          tooltips: {
+              enabled: false
+          }
+        }
+      });
+
+      // bar
+      var ctx = document.getElementById('c2').getContext('2d');
+      var myDoughnutChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: [
+            'collision',
+            "Bande blanche",
+            "Vitesse insuffisante",
+            "Vitesse trop élevée",
+            "Clignottants oubliés",
+            "Clignottants superflus",
+            "Virage trop serré",
+            "Freinage trop fort",
+            "Distances de sécurité",
+            "Hors-route",
+          ],
+          datasets: [{
+            backgroundColor: [    
+              '#FFCC33',// 0.4, 
+              'red',// 0.6,
+              '#9CC03B',// 0.1, 
+              '#FFCC33',// 0.2, 
+              'red',// 0.8, 
+              '#9CC03B',// 0.05, 
+              'red',// 0.5, 
+              '#FFCC33',// 0.3, 
+              'red',// 0.9, 
+              '#9CC03B',// 0.02
+            ],
+            data: [
+            0.4, 
+            0.6,
+            0.1, 
+            0.2, 
+            0.8, 
+            0.05, 
+            0.5, 
+            0.3, 
+            0.9, 
+            0.02
+            ],
+          }]
+        },
+        options: {
+          legend: {
+            display: false
+          },
+        }
+      });
+
+      // Donut
+      var ctx = document.getElementById('c3').getContext('2d');
+      var myDoughnutChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [
+            'janvier 2018',
+            'février 2018',
+            'mars 2018',
+            'avril 2018',
+            'mai 2018',
+          ],
+          datasets: [{
+            backgroundColor: [
+              '#FFCC33',
+            ],
+            borderColor: [
+              '#333'
+            ],
+            pointRadius: 5,
+            data: [6.5, 7.2, 8.1, 7.6, 8.4],
+          }]
+        },
+        options: {
+          legend: {
+            display: false
+          },
+          tooltips: {
+              enabled: false
+          }
+        }
+      });
+    </script>
   </body>
 </html>
