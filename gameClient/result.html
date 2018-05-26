@@ -142,19 +142,19 @@
         collision: "Collision",
       }
 
-      const errors = demoErrors
+      let errors = demoErrors
       errors.collision = {
         lost: 10
       }
 
       let str = ''
-      for(var key in errors){
-        const error = errors[key]
+      errors = Object.keys(errors).map(e => ({... errors[e], key: e})).sort(function(a,b){return b.lost - a.lost})
+      for(var error of errors){
         str += template({
-          icon: '/icons/' + key + '.svg',
+          icon: '/icons/' + error.key + '.svg',
           background:  error.lost == 10 ? 'rgba(255,0,0,0.2)' : '',
           color: error.lost == 0 ? '#9CC03B' : (error.lost < 2 ? '#fe7310' : 'red'),
-          name: niceWarning[key],
+          name: niceWarning[error.key],
           points: error.lost.toFixed(1),
         })
       }
